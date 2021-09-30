@@ -1,0 +1,20 @@
+name: flutter_lndhub_example
+description: Flutter LndHub lib example.
+version: 0.1.0
+homepage: https://github.com/o-compilador/flutter_lndhub
+publish_to: "none"
+
+environment:
+  sdk: ">=2.13.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  flutter_lndhub:
+    path: ../
+    
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
