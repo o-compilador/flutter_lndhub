@@ -2,21 +2,20 @@
 // ignore_for_file: public_member_api_docs
 
 import 'api_response.dart';
-import 'base_body.dart';
 
-class AuthResponseBody extends BaseBody {
-  const AuthResponseBody({
+class AuthResponse {
+  const AuthResponse({
     required this.accessToken,
     required this.tokenType,
     required this.refreshToken,
     required this.expiry,
   });
 
-  factory AuthResponseBody.fromJson(JSON json) {
-    return AuthResponseBody(
-      accessToken: json['accessToken'] as String,
-      tokenType: json['tokenType'] as String,
-      refreshToken: json['refreshToken'] as String,
+  factory AuthResponse.fromJSON(JSON json) {
+    return AuthResponse(
+      accessToken: json['access_token'] as String,
+      tokenType: json['token_type'] as String,
+      refreshToken: json['refresh_token'] as String,
       expiry: DateTime.parse(json['expiry'] as String),
     );
   }
