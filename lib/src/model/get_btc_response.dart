@@ -30,7 +30,7 @@ class BTCAddressResponse {
 class GetBTCResponse {
   const GetBTCResponse(this.addresses);
 
-  factory GetBTCResponse.fromJson(List<JSON> json) {
+  factory GetBTCResponse.fromJSON(List<JSON> json) {
     return GetBTCResponse(
       json.map((e) => BTCAddress.fromJson(e)).toList(),
     );

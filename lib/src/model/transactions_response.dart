@@ -70,7 +70,7 @@ class TransactionResponse {
 class TransactionsResponse {
   const TransactionsResponse(this.transactions);
 
-  factory TransactionsResponse.fromJson(List<JSON> json) {
+  factory TransactionsResponse.fromJSON(List<JSON> json) {
     return TransactionsResponse(
         json.map((e) => TransactionResponse.fromJSON(e)).toList());
   }

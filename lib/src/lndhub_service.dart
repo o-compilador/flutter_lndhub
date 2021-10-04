@@ -3,7 +3,9 @@
 
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_lndhub/src/model/account_type.dart';
+import 'package:flutter_lndhub/src/model/api_error_response.dart';
 import 'package:flutter_lndhub/src/model/auth_response.dart';
 import 'package:flutter_lndhub/src/model/get_balance_response.dart';
 import 'package:flutter_lndhub/src/model/get_info_response.dart';
@@ -21,7 +23,7 @@ import 'model/method.dart';
 
 class LndHubService {
   LndHubService({
-    required this.lndHubUrl,
+    required this.baseUri,
     this.defaultAccountType = AccountType.common,
     this.partnerId,
   });
@@ -29,37 +31,62 @@ class LndHubService {
   final http.Client _client = http.Client();
   final AccountType defaultAccountType;
   final String? partnerId;
-  final String lndHubUrl;
+  final String baseUri;
 
   Future<ApiResponse<T>> _request<T>({
     required Uri path,
     required Method method,
-    Object? body,
+    Map<String, dynamic>? body,
     Map<String, String>? headers,
   }) async {
-    final url = Uri.parse('$lndHubUrl$path');
-
-    final req = http.Request(method.value, url);
-
-    req.headers.addAll({
-      'Access-Control-Allow-Origin': '*',
-      'Content-Type': 'application/json',
-    });
+    final url = Uri.parse('$baseUri$path');
 
     if (headers != null) {
-      req.headers.addAll(headers);
+      headers.addAll({
+        'content-type': 'application/json',
+        'access-control-allow-origin': '*',
+      });
     }
 
-    if (body != null) {
-      req.body = jsonEncode(body);
+    http.Response res;
+    switch (method) {
+      case Method.get:
+        {
+          res = await _client.get(
+            url,
+            headers: headers,
+          );
+          break;
+        }
+
+      case Method.post:
+        {
+          res = await _client.post(
+            url,
+            headers: headers,
+            body: body,
+          );
+          break;
+        }
     }
+    final JSON resBody = jsonDecode(res.body) as JSON;
 
-    final res = await http.Response.fromStream(await _client.send(req));
+    try {
+      return ApiResponse<T>.fromJSON(resBody, res.statusCode);
+    } catch (e) {
+      if (kDebugMode) {
+        if (e is ApiErrorResponse) {
+          e.printToConsole();
+        } else {
+          // ignore: avoid_print
+          print('Got error from LndHub:');
+          // ignore: avoid_print
+          print(e.toString());
+        }
+      }
 
-    return ApiResponse.fromJSON(
-      jsonDecode(res.body) as JSON,
-      res.statusCode,
-    );
+      rethrow;
+    }
   }
 
   Future<ApiResponse<CreateResponse>> create(
@@ -68,10 +95,10 @@ class LndHubService {
     return _request(
       path: Uri.parse('/create'),
       method: Method.post,
-      body: jsonEncode(<String, dynamic>{
-        'accounttype': accountType ?? defaultAccountType,
-        'partnerid': partnerId,
-      }),
+      body: <String, dynamic>{
+        'accounttype': accountType?.value ?? defaultAccountType.value,
+        'partnerid': partnerId ?? 'bluewallet',
+      },
     );
   }
 
@@ -82,10 +109,10 @@ class LndHubService {
     return _request(
       path: Uri.parse('/auth?type=auth'),
       method: Method.post,
-      body: jsonEncode(<String, dynamic>{
+      body: <String, dynamic>{
         'login': login,
         'password': password,
-      }),
+      },
     );
   }
 
@@ -95,9 +122,9 @@ class LndHubService {
     return _request(
       path: Uri.parse('/auth?type=refresh_token'),
       method: Method.post,
-      body: jsonEncode(<String, dynamic>{
+      body: <String, dynamic>{
         'refresh_token': refreshToken,
-      }),
+      },
     );
   }
 
@@ -108,11 +135,11 @@ class LndHubService {
     return _request(
       path: Uri.parse('/oauth2/token'),
       method: Method.post,
-      body: jsonEncode(<String, dynamic>{
+      body: <String, dynamic>{
         'grant_type': 'client_credentials',
-        'client_id': clientId,
+        'cient_id': clientId,
         'client_secret': clientSecret,
-      }),
+      },
     );
   }
 
@@ -202,7 +229,7 @@ class LndHubService {
       headers: {
         'Authorization': 'Bearer $accessToken',
       },
-      body: {
+      body: <String, dynamic>{
         'invoice': invoice,
       },
     );
@@ -218,7 +245,7 @@ class LndHubService {
       headers: {
         'Authorization': 'Bearer $accessToken',
       },
-      body: {
+      body: <String, dynamic>{
         'invoice': invoice,
       },
     );
@@ -242,7 +269,7 @@ class LndHubService {
     required String accessToken,
   }) async {
     return _request(
-      path: Uri.parse('/getbalance'),
+      path: Uri.parse('/balance'),
       method: Method.get,
       headers: {
         'Authorization': 'Bearer $accessToken',

@@ -57,7 +57,7 @@ class DecodedInvoiceResponse {
     required this.routeHints,
   });
 
-  factory DecodedInvoiceResponse.fromJson(JSON json) {
+  factory DecodedInvoiceResponse.fromJSON(JSON json) {
     return DecodedInvoiceResponse(
       destination: json['destination'] as String,
       paymentHash: json['payment_hash'] as String,
