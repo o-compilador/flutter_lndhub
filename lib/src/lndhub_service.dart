@@ -235,6 +235,19 @@ class LndHubService {
     );
   }
 
+  Future<ApiResponse<PayInvoiceResponse>> checkPayment({
+    required String paymentHash,
+    required String accessToken,
+  }) async {
+    return _request(
+      path: Uri.parse('/checkpayment/$paymentHash'),
+      method: Method.get,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+  }
+
   Future<ApiResponse<TransactionResponse>> sendCoins({
     required String invoice,
     required String accessToken,

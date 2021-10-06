@@ -4,6 +4,7 @@
 import 'package:flutter_lndhub/flutter_lndhub.dart';
 import 'package:flutter_lndhub/src/model/api_error_response.dart';
 import 'package:flutter_lndhub/src/model/auth_response.dart';
+import 'package:flutter_lndhub/src/model/check_invoice_payment.dart';
 import 'package:flutter_lndhub/src/model/create_response.dart';
 
 typedef JSON = Map<String, dynamic>;
@@ -89,6 +90,13 @@ class ApiResponse<T> {
       return ApiResponse(
         statusCode: statusCode,
         data: TransactionsResponse.fromJSON(json as List<JSON>) as T,
+      );
+    }
+
+    if (T == CheckInvoicePaymentResponse) {
+      return ApiResponse(
+        statusCode: statusCode,
+        data: CheckInvoicePaymentResponse.fromJSON(json) as T,
       );
     }
 

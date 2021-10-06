@@ -5,6 +5,7 @@ export 'src/model/account_type.dart' show AccountType;
 export 'src/model/api_error_response.dart';
 export 'src/model/api_response.dart';
 export 'src/model/auth_response.dart';
+export 'src/model/check_invoice_payment.dart';
 export 'src/model/check_route_response.dart';
 export 'src/model/create_response.dart';
 export 'src/model/decoded_invoice_response.dart';
